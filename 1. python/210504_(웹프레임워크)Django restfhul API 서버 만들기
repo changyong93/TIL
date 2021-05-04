@@ -32,8 +32,8 @@
 2회차 : https://www.youtube.com/watch?v=lKDw_xqo-Ro
 - 장고에 restful 프레임워크를 설치하여 클라이언트와 통신 기능 구현
 - api 서버를 테스트 시 서버를 데이터를 전송하는 클라이언트(프로그램)이 필요 => 테스트 전용 툴 활용(insomnia Rest client, ...)
-- 테스트 및 서버 구축 진행 => Djangorestframework(Django안에서 RESTful API서버를 쉽게 구축할 수 있도록 도와주는 오픈소스 라이브러리, 검색 후 해당 페이지에서 지시한 라이브러리 설치)
-  : Djangorestframework, django-filter, markdown
+- 테스트 및 서버 구축 진행 => https://www.django-rest-framework.org/ 참고
+- 
   
 
     
