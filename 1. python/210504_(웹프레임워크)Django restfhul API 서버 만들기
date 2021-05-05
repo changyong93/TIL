@@ -33,8 +33,82 @@
 - 장고에 restful 프레임워크를 설치하여 클라이언트와 통신 기능 구현
 - api 서버를 테스트 시 서버를 데이터를 전송하는 클라이언트(프로그램)이 필요 => 테스트 전용 툴 활용(insomnia Rest client, ...)
 - 테스트 및 서버 구축 진행 => https://www.django-rest-framework.org/ 참고
-- 
-  
 
-    
-    
+- 서버 로그인을 위하여 관리자 계정(슈퍼계정) 생성 => manage.py 파일이 위치한 경로로 이동 => python manage.py 입력 시 관련 명령어 확인 가능
+  => python manage.py createsuperuser => 이후 출력된 문구에 따라 진행
+  
+**urls.py 해석
+"""restapiserver URL Configuration
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/3.1/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+from django.urls import path, include
+from django.contrib.auth.models import User
+from rest_framework import routers, serializers, viewsets
+
+
+# Serializers define the API representation.
+###### UserSerializer = 응답을 데이터를 json 형태로 만들어주는 기능
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = User
+        fields = ['url', 'username', 'email', 'is_staff']
+User = Model
+**ORM을 활용하는 장고에서는 입력할 데이터셋을 모델로 관리
+**일반적인 코딩 시에는 DB와 프레임워크가 별개로 존재 => 이 경우 특정 데이터가 필요하면 DB에서 테이블 생성(컬럼 등) => DB의 이 데이터셋 구조를 프레임워크에서 동일한 구조체 생성
+  => DB의 특정 테이블이 어떤 식으로 구성되어있는지 명시 => 즉 개발자는 소스 및 DB에서 테이블을 둘 다 명시해야 함
+**이와 다르게, ORM을 사용하는 프레임 워크는 테이블 형태를 명시하는데(장고에서는 모델을 만든다고 표현함), 이 경우 자동적으로 연동된 DB에 테이블이 생성됨 => 따라서 DB에서 create table 등을 할 필요가 없음
+**데이터 호출 시에도 모델에서 데이터를 바로 불러올 수 있음
+**장고에 user는 장고를 사용시 자동으로 생성되는 모델로, 더 많은 컬럼셋이 존재하지만, 명시한 ['url',...,'is_staff]만 json 형태로 만든다는 코드로 된 모델
+
+
+# ViewSets define the view behavior.
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    ##### userviewset을 실행하면 우선 쿼리에 user의 모든 객체를 queryset에 넣으라는 코드
+    ##### query는 상기와 같고, 보여주는 방방은 UserSerializer, 즉 json 형태
+
+
+# Routers provide an easy way of automatically determining the URL conf.
+router = routers.DefaultRouter()
+router.register(r'users', UserViewSet)
+#####users를 실행시키면 userviewset을 보여줌
+
+# Wire up our API using automatic URL routing.
+# Additionally, we include login URLs for the browsable API.
+urlpatterns = [
+    path('', include(router.urls)),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+]
+
+- api 서버 생성 시 특정 응답이 왔을 때 특정 결과를 호출하는 것을 구현해야 함
+    => 즉 모델을 생성해야 함 
+- model 생성(이름, 전화번호, 주소가 있는 주소록 모델 생성) => json화 하는 Serializer 필드로 사용 => URL 구현
+  => ~/addresses => 주소록 모델 호출
+  **참고 : MVC(Model view control)
+            - model : 데이터 형식
+            - view : 화면 출력
+            - control : 데이터 가공하는 곳
+          **단 장고에선 view가 html templete 형태로 되어있고, control 하는 곳의 이름이 view
+          **장고에선 view.py을 만드는데 실질적으로 하는 역할을 c(control)
+- 새로운 앱 생성 => manage.py가 있는 경로로 이동 => python manage.py createapp [app이름] => settings.py의 installed_apps에 명시
+- models 구현 => python manage.py makemigrations, 변경 사항 적용 => python manage.py migrate, DB에 테이블 생성
+  => 이후 json 형태로 데이터를 받기 위한 Serializers 구현 => 데이터를 받고 응답을 주는 views 구현
+- 이후 urls.py의 urlpatterns에 상기 기능을 통신할 수 있는 url 주소 생성
+
+  ------------------------------------------------------------------------------------------------
+  3회차 : https://www.youtube.com/watch?v=KRJRD2Kkf8w&t=2s
+  특정 object 조회, 삭제, 변경 기능 구현, db 데이터 읽기, 로그인 기능 구현
+  
