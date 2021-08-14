@@ -57,4 +57,4 @@ for i, idx in enumerate(maps):
 
 shark, time, eat_cnt = 2,0,0 #상어 크기, 시간, 물고기 먹은 횟수를 해당 변수에 할당
 while True:
-    x,y,shark,eat_cnt,time = bfs(x,y,shark,eat_cnt,time) #bfs로 시작!
+    x,y,shark,eat_cnt,time = bfs(x,y,shark,eat_cnt,time) #bfs로 시작!.
