@@ -24,5 +24,5 @@ for i in range(1,n+1):
         else:
             knapsack[i][j] = max(knapsack[i-1][j], stuff[i-1][1] + knapsack[i-1][j-stuff[i-1][0]])
 
-#항상 마지막 행 & 마지막 열의 값이 최대값을 가지므로 그 값을 반환
+#항상 마지막 행 & 마지막 열의 값이 최대값
 print(knapsack[-1][-1])
