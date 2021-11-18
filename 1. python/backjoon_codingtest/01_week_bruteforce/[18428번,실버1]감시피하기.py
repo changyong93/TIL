@@ -1,62 +1,42 @@
 import sys
-from collections import Counter, deque
 from itertools import combinations
-# input = sys.stdin.readline
-input = iter([5,
-"X S X X T",
-"T X S X X",
-"X X X X X",
-"X T X X X",
-"X X T X X",])
 
-objects_set = set()
-def check_escape(students=[], teachers=[], maps=[]):
-    if len(objects_set)==0:
-        # n = int(input().strip())
-        # maps = [input().strip().split() for _ in range(n)]
-        n = int(next(input))
-        maps = [next(input).split() for _ in range(n)]
+def watch(teacher_list,maps,walls,N):
+    for teacher in teacher_list:
+        for nx,ny in [(-1,0),(1,0),(0,-1),(0,1)]:
+            x,y = teacher
+            while 0 <= x <= N-1 and 0 <= y <= N-1:
+                if maps[x][y] == "S":
+                    return False
+                if (x,y) in walls:
+                    break
+                x+=nx; y+=ny
+                
+    return True
 
-        for i in range(n):
-            for j in range(n):
-                if maps[i][j]=="T":
-                    teachers.append((i,j))
-                    continue
-                if maps[i][j]=="S":
-                    students.append((i,j))
-                    continue
-    
-        for s_i,s_j in students:
-            for t_i,t_j in teachers:
-                if s_i == t_i:
-                    s,e = min(s_j,t_j), max(s_j,t_j)
-                    objects_set.update([(s_i, loc) for loc in range(s+1,e)])
-                elif s_j==t_j:
-                    s,e = min(s_i,t_i), max(s_i,t_i)
-                    objects_set.update([(loc, s_j) for loc in range(s+1,e)])
-        check_escape(students, teachers, maps)
 
-    else:
-        object_comb = list(combinations(objects_set,3))
-        for objects in objects_set:
-            for s_i,s_j in students:
-                for t_i,t_j in teachers:
-                    if s_i == t_i:
-                        s,e = min(s_j,t_j), max(s_j,t_j)
-                        tmp = [(s_i, loc) for loc in range(s+1,e)]
+def escape(empty_list,teacher_list,maps,N):
+    #벽 3개 뽑기
+    for walls in combinations(empty_list,3):
+        #탈출 가능한지 확인하기
+        if watch(teacher_list,maps,walls, N):
+            print("YES")
+            return
+    print("NO")
 
-                    elif s_j==t_j:
-                        s,e = min(s_i,t_i), max(s_i,t_i)
-                        tmp = [(loc, s_j) for loc in range(s+1,e)]
-
-                    if len(set.intersection(set(objects), set(tmp))) != 0:
-                        
-                        print("NO")
-                        return
-                    continue
-        print("YES")
-
-    
-
+inputs = sys.stdin.readline
 if __name__=="__main__":
-    check_escape()
+    N = int(inputs())
+    maps = [inputs().strip().split() for _ in range(N)]
+    
+    #빈 공간 및 선생님 위치 확인
+    empty_list = []
+    teacher_list = []
+    for i in range(len(maps)):
+        for j in range(len(maps)):
+            if maps[i][j] == "T":
+                teacher_list.append((i,j))
+            elif maps[i][j] == "X":
+                empty_list.append((i,j))
+
+    escape(empty_list,teacher_list,maps,N)
